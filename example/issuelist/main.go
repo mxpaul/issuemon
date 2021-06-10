@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os/user"
+	"path/filepath"
 	"sort"
 	"strings"
 	"time"
@@ -53,7 +55,7 @@ func ParseCommandLineOrDie() *CmdOptions {
 	opt := &CmdOptions{}
 
 	flag.Var(&opt.GroupIDList, "group", "gitlab group id to look for issues in")
-	flag.StringVar(&opt.TokenFilePath, "token-file", "./gitlab.token.txt", "read gitlab secret token from this file")
+	flag.StringVar(&opt.TokenFilePath, "token-file", "~/.issuemon/gitlab-token", "read gitlab secret token from this file")
 	flag.StringVar(&opt.AssignUser, "username", "mxpatlas", "search issues assigned to this gitlab username")
 
 	flag.Parse()
@@ -69,9 +71,26 @@ func ParseCommandLineOrDie() *CmdOptions {
 // Gitlab API
 // ############################################################################
 func GitlabToken(opt *CmdOptions) (string, error) {
-	gitlabTokenBytes, err := ioutil.ReadFile(opt.TokenFilePath)
+	path := opt.TokenFilePath
+	if strings.HasPrefix(path, "~/") {
+		curUser, err := user.Current()
+		if err != nil {
+			return "", fmt.Errorf("user.Current() error: %v", err)
+		}
+		path = filepath.Join(curUser.HomeDir, path[2:])
+	}
+
+	if !filepath.IsAbs(path) {
+		absPath, err := filepath.Abs(path)
+		if err != nil {
+			return "", fmt.Errorf("Failed to make absolute path from %q: %v", path, err)
+		}
+		path = absPath
+	}
+
+	gitlabTokenBytes, err := ioutil.ReadFile(path)
 	if err != nil {
-		return "", fmt.Errorf("Failed to read gitlab token from file %q: %v", opt.TokenFilePath, err)
+		return "", fmt.Errorf("Failed to read gitlab token from file %q: %v", path, err)
 	}
 	gitlabToken := strings.TrimSuffix(string(gitlabTokenBytes), "\n")
 	return gitlabToken, nil
