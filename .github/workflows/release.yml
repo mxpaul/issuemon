@@ -1,0 +1,31 @@
+---
+name: "tagged-release"
+
+#on:
+#  push:
+#    tags:
+#      - "v*"
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      -
+        name: "Build"
+        run: ./build/build_binaries.sh 
+        env:
+          BUILD_DIR: /tmp/build_root/issuemon
+      -
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.RELEASE_TOKEN }}"
+          prerelease: true
+          files: |
+            /tmp/build_root/issuemon/bin/issuelist
+            /tmp/build_root/issuemon/bin/grouplist

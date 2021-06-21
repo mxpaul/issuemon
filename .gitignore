@@ -2,3 +2,5 @@ gitlab.token.txt
 autom4te.cache
 config.log
 config.status
+/dist_build/
+/dist/
