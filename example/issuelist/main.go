@@ -61,7 +61,7 @@ func ParseCommandLineOrDie() *CmdOptions {
 	flag.Parse()
 
 	if len(opt.GroupIDList) == 0 {
-		opt.GroupIDList = GroupArray{"11827547", "11536035"}
+		opt.GroupIDList = GroupArray{"11827547", "11536035", "12255376"}
 	}
 
 	return opt
