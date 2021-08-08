@@ -25,12 +25,12 @@ jobs:
         name: Cache build result
         uses: actions/cache@v2
         env:
-          cache-name: cache-node-modules
+          cache-name: dist_build
         with:
-          # npm cache files are stored in `~/.npm` on Linux/macOS
           path: ./dist_build/
           key: ${{ runner.os }}-dist_build-${{ github.sha }}
-      - name: Download latest earthly
+      -
+        name: Download latest earthly
         run: |
           wget https://github.com/earthly/earthly/releases/download/v0.5.20/earthly-linux-amd64 \
             -O /tmp/earthly && chmod +x /tmp/earthly
@@ -53,6 +53,14 @@ jobs:
       -
         name: Checkout code
         uses: actions/checkout@v2
+      -
+        name: Cache build result
+        uses: actions/cache@v2
+        env:
+          cache-name: dist_build
+        with:
+          path: ./dist_build/
+          key: ${{ runner.os }}-dist_build-${{ github.sha }}
       -
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
