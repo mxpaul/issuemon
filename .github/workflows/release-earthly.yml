@@ -40,11 +40,31 @@ jobs:
 #        env:
 #          BUILD_DIR: /tmp/build_root/issuemon
 
+  tests-unit:
+    name: "Unit testing"
+    runs-on: "ubuntu-latest"
+    env:
+      FORCE_COLOR: 1
+
+    steps:
+      -
+        name: Checkout code
+        uses: actions/checkout@v2
+      -
+        name: Download latest earthly
+        run: |
+          wget https://github.com/earthly/earthly/releases/download/v0.5.20/earthly-linux-amd64 \
+            -O /tmp/earthly && chmod +x /tmp/earthly
+      -
+        name: "Unit tests"
+        run: /tmp/earthly --build-arg GOFLAGS=-v +test
+
   tagged-release:
     name: "Tagged Release"
     runs-on: "ubuntu-latest"
     needs:
       - build
+      - tests-unit
     #env:
       #DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
       #DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
