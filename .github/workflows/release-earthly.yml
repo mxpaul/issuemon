@@ -1,0 +1,39 @@
+---
+name: "tagged-release-earthly"
+
+#on:
+#  push:
+#    tags:
+#      - "v*"
+on:
+  push:
+    branches:
+      - "master"
+
+jobs:
+  tagged-release:
+    name: "Tagged Release"
+    runs-on: "ubuntu-latest"
+
+    steps:
+      -
+        name: Checkout code
+        uses: actions/checkout@v2
+      - name: Download latest earthly
+        run: |
+          wget https://github.com/earthly/earthly/releases/download/v0.5.20/earthly-linux-amd64 \
+            -O /tmp/earthly && chmod +x /tmp/earthly
+      -
+        name: "Build"
+        run: /tmp/earthly +build
+#        env:
+#          BUILD_DIR: /tmp/build_root/issuemon
+#      -
+#        uses: "marvinpinto/action-automatic-releases@latest"
+#        with:
+#          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+#          automatic_release_tag: "latest"
+#          prerelease: true
+#          files: |
+#            ./dist_build/bin/issuelist
+#            ./dist_build/bin/grouplist
